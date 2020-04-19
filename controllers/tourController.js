@@ -5,6 +5,18 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/tours-simple.json`)
 );
 
+// Check body of request object
+exports.checkBody = (req, res, next) => {
+  const { name, price } = req.body;
+  if (!name || !price) {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'Tour must contain name and price properties',
+    });
+  }
+  next();
+};
+
 /************************************************* ROUTE HANDLERS ********************************************************/
 exports.getAllTours = (req, res) => {
   res.status(200).json({
@@ -45,7 +57,7 @@ exports.createTour = (req, res) => {
     `${__dirname}/dev-data/tours-simple.json`,
     JSON.stringify(tours),
     (err) => {
-      res.status(201).json({
+      return res.status(201).json({
         status: 'success',
         data: {
           tour: newTour,
@@ -53,8 +65,6 @@ exports.createTour = (req, res) => {
       });
     }
   );
-
-  res.send('Processing complete');
 };
 
 exports.updateTour = (req, res) => {

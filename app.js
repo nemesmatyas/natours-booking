@@ -13,6 +13,8 @@ app.use(morgan('dev'));
 // JSON body parser middleware to have the request body available on the req object when sending a POST request
 app.use(express.json());
 
+app.use(express.static('./public'));
+
 // Add timestamp to request object
 app.use((req, res, next) => {
   req.requestTimestamp = new Date().toISOString();
