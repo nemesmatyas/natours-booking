@@ -8,7 +8,9 @@ const app = express();
 
 /************************************************ MIDDLEWARES **********************************************************/
 // Morgan - logging middleware
-app.use(morgan('dev'));
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
 
 // JSON body parser middleware to have the request body available on the req object when sending a POST request
 app.use(express.json());

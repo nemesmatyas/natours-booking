@@ -4,7 +4,8 @@
   "description": "Tour booking app with Node.js, Express, MongoDB and Mongoose",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "prod": "NODE_ENV=production nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
   },
   "homepage": "https://github.com/nemesmatyas/natours-booking#readme",
   "dependencies": {
+    "dotenv": "^8.2.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb": "^18.1.0",
     "eslint-config-prettier": "^6.10.1",
