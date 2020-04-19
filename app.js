@@ -6,10 +6,13 @@ const app = express();
 // Middleware to have the request body available on the req object when sending a POST request
 app.use(express.json());
 
+// Currently API is stored locally - read data here
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/tours-simple.json`)
 );
-// ROUTE HANDLER
+
+/************************************************* ROUTE HANDLERS ********************************************************/
+// GET ALL TOURS
 app.get('/api/v1/tours', (req, res) => {
   res.status(200).json({
     status: 'success',
@@ -20,6 +23,28 @@ app.get('/api/v1/tours', (req, res) => {
   });
 });
 
+// GET ONE TOUR WITH A SPECIFIC ID
+app.get('/api/v1/tours/:id', (req, res) => {
+  const paramID = parseInt(req.params.id);
+  const tour = tours.find(el => paramID === el.id);
+  console.log(tours.length);
+
+  if (paramID >= tours.length) {
+    return res.status(404).json({
+      status: 'fail',
+      message: "The required tour ID doesn't exist",
+    });
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour,
+    },
+  });
+});
+
+// CREATE NEW TOUR
 app.post('/api/v1/tours', (req, res) => {
   const newID = tours[tours.length - 1].id + 1;
   const newTour = { id: newID, ...req.body };
