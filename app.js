@@ -12,8 +12,7 @@ const tours = JSON.parse(
 );
 
 /************************************************* ROUTE HANDLERS ********************************************************/
-// GET ALL TOURS
-app.get('/api/v1/tours', (req, res) => {
+const getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
     numberOfResults: tours.length,
@@ -21,10 +20,9 @@ app.get('/api/v1/tours', (req, res) => {
       tours,
     },
   });
-});
+};
 
-// GET ONE TOUR WITH A SPECIFIC ID
-app.get('/api/v1/tours/:id', (req, res) => {
+const getTour = (req, res) => {
   const paramID = parseInt(req.params.id);
   const tour = tours.find(el => paramID === el.id);
   console.log(tours.length);
@@ -42,10 +40,9 @@ app.get('/api/v1/tours/:id', (req, res) => {
       tour,
     },
   });
-});
+};
 
-// CREATE NEW TOUR
-app.post('/api/v1/tours', (req, res) => {
+const createTour = (req, res) => {
   const newID = tours[tours.length - 1].id + 1;
   const newTour = { id: newID, ...req.body };
 
@@ -64,25 +61,34 @@ app.post('/api/v1/tours', (req, res) => {
   );
 
   res.send('Processing complete');
-});
+};
 
-// UPDATE TOUR
-app.patch('/api/v1/tours/:id', (req, res) => {
+const updateTour = (req, res) => {
   res.status(200).json({
     status: 'success',
     data: {
       tour: '<Updated tour here>',
     },
   });
-});
+};
 
-// DELETE TOUR
-app.delete('/api/v1/tours/:id', (req, res) => {
+const deleteTour = (req, res) => {
   res.status(204).json({
     status: 'success',
     data: null,
   });
-});
+};
+
+app
+  .route('/api/v1/tours')
+  .get(getAllTours)
+  .post(createTour);
+
+app
+  .route('/api/v1/tours/:id')
+  .get(getTour)
+  .patch(updateTour)
+  .delete(deleteTour);
 
 /********************************************************** SERVER  **************************************************************/
 const port = 8000;
