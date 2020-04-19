@@ -1,10 +1,22 @@
 const express = require('express');
 const fs = require('fs');
+const morgan = require('morgan');
 
 const app = express();
 
-// Middleware to have the request body available on the req object when sending a POST request
+/************************************************ MIDDLEWARES **********************************************************/
+// Morgan - logging middleware
+app.use(morgan('dev'));
+
+// JSON body parser middleware to have the request body available on the req object when sending a POST request
 app.use(express.json());
+
+// Add timestamp to request object
+app.use((req, res, next) => {
+  req.requestTimestamp = new Date().toISOString();
+  console.log(req.requestTimestamp);
+  next();
+});
 
 // Currently API is stored locally - read data here
 const tours = JSON.parse(
@@ -16,6 +28,7 @@ const getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
     numberOfResults: tours.length,
+    requestedAt: req.requestTimestamp,
     data: {
       tours,
     },
@@ -79,16 +92,68 @@ const deleteTour = (req, res) => {
   });
 };
 
-app
-  .route('/api/v1/tours')
+const getAllUsers = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not yet implemented',
+  });
+};
+
+const getUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not yet implemented',
+  });
+};
+
+const createUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not yet implemented',
+  });
+};
+
+const updateUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not yet implemented',
+  });
+};
+
+const deleteUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not yet implemented',
+  });
+};
+
+/***************************************************** ROUTES *******************************************************/
+const tourRouter = express.Router();
+const userRouter = express.Router();
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
+
+tourRouter
+  .route('/')
   .get(getAllTours)
   .post(createTour);
 
-app
-  .route('/api/v1/tours/:id')
+tourRouter
+  .route('/:id')
   .get(getTour)
   .patch(updateTour)
   .delete(deleteTour);
+
+userRouter
+  .route('/')
+  .get(getAllUsers)
+  .post(createUser);
+
+userRouter
+  .route('/:id')
+  .get(getUser)
+  .patch(updateUser)
+  .delete(deleteUser);
 
 /********************************************************** SERVER  **************************************************************/
 const port = 8000;
