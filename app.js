@@ -29,7 +29,7 @@ app.get('/api/v1/tours/:id', (req, res) => {
   const tour = tours.find(el => paramID === el.id);
   console.log(tours.length);
 
-  if (paramID >= tours.length) {
+  if (!tour) {
     return res.status(404).json({
       status: 'fail',
       message: "The required tour ID doesn't exist",
@@ -66,6 +66,25 @@ app.post('/api/v1/tours', (req, res) => {
   res.send('Processing complete');
 });
 
+// UPDATE TOUR
+app.patch('/api/v1/tours/:id', (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour: '<Updated tour here>',
+    },
+  });
+});
+
+// DELETE TOUR
+app.delete('/api/v1/tours/:id', (req, res) => {
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
+});
+
+/********************************************************** SERVER  **************************************************************/
 const port = 8000;
 app.listen(port, () => {
   console.log(`App running on port ${port}...`);
