@@ -17,12 +17,6 @@ app.use(express.json());
 
 app.use(express.static('./public'));
 
-// Add timestamp to request object
-app.use((req, res, next) => {
-  req.requestTimestamp = new Date().toISOString();
-  next();
-});
-
 /***************************************************** ROUTES *******************************************************/
 
 app.use('/api/v1/tours', tourRouter);

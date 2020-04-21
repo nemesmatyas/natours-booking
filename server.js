@@ -9,7 +9,7 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log('DB connection successful'));
+  .then(() => console.log('DB connection successful!'));
 
 const port = process.env.PORT || 8000;
 app.listen(port, () => {
