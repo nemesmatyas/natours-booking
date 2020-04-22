@@ -3,8 +3,25 @@ const Tour = require('../models/tourModel');
 /************************************************* ROUTE HANDLERS ********************************************************/
 exports.getAllTours = async (req, res) => {
   try {
-    const tours = await Tour.find();
-    res.status(200).json({
+    const queryObj = { ...req.query }; // Shallow copy of the query object
+
+    // Exclude Mongoose specific filter fields
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    excludedFields.forEach((field) => delete queryObj[field]);
+
+    // Advanced filtering - less than, greater than
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+
+    // Build query in order to be able to implement filtering
+    const query = Tour.find(JSON.parse(queryStr));
+
+    console.log(req.query);
+
+    // Run query
+    const tours = await query;
+
+    return res.status(200).json({
       status: 'success',
       numberOfResults: tours.length,
       data: {
@@ -12,7 +29,7 @@ exports.getAllTours = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(404).json({
+    return res.status(404).json({
       status: 'fail',
       message: err,
     });
