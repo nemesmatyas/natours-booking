@@ -24,7 +24,13 @@ exports.getAllTours = async (req, res) => {
       query = query.sort('-createdAt'); // Default sorting: the newest tours are displayed first in the list
     }
 
-    console.log(req.query);
+    // Field limiting - display only the fields requested by the user
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields);
+    } else {
+      query = query.select('-__v'); // Always remove the __v fields from the returned query, because it is only used by Mongoose internally and not relevant to user
+    }
 
     // Run query
     const tours = await query;
