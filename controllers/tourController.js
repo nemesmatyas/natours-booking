@@ -14,7 +14,15 @@ exports.getAllTours = async (req, res) => {
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
     // Build query in order to be able to implement filtering
-    const query = Tour.find(JSON.parse(queryStr));
+    let query = Tour.find(JSON.parse(queryStr));
+
+    // Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' '); // Transform the list of fields to sort by (they are separated by commas in the query, but Mongoose can handle them if they are separated by spaces)
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort('-createdAt'); // Default sorting: the newest tours are displayed first in the list
+    }
 
     console.log(req.query);
 
