@@ -32,6 +32,20 @@ exports.getAllTours = async (req, res) => {
       query = query.select('-__v'); // Always remove the __v fields from the returned query, because it is only used by Mongoose internally and not relevant to user
     }
 
+    // Pagination
+    const page = req.query.page * 1 || 1; // Convert the page value to number, or set the default page to 1
+    const limit = req.query.limit * 1 || 100;
+    const skip = (page - 1) * limit; // The results that are actually not shown when we request a page
+    query = query.skip(skip).limit(limit);
+
+    // Check if the number of skipped documents is bigger than the number of existing documents
+    if (req.query.page) {
+      const numOfTours = await Tour.countDocuments();
+      if (skip >= numOfTours) {
+        throw new Error('This page does not exist');
+      }
+    }
+
     // Run query
     const tours = await query;
 
