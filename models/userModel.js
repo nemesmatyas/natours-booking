@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema({
       message: 'Password and confirm password must match',
     },
   },
+  passwordChangedAt: Date,
 });
 
 // Password hashing
@@ -53,6 +54,26 @@ userSchema.methods.correctPassword = async function(
   userPassword
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+/**
+ * Check if the user changed password after the token was issued
+ * Adds another layer of security
+ * @param jwtTimestamp - time when the JWT was issued
+ * @return { Boolean } - whether or not the user has changed password after token issue
+ */
+// eslint-disable-next-line prettier/prettier
+userSchema.methods.changedPasswordAfterTokenIssue = function(jwtTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedAtTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+
+    return jwtTimestamp < changedAtTimestamp;
+  }
+
+  return false;
 };
 
 const User = mongoose.model('User', userSchema);
