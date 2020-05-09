@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: [true, 'Please provide a name'] },
@@ -29,6 +30,8 @@ const userSchema = new mongoose.Schema({
       message: 'Password and confirm password must match',
     },
   },
+  passwordResetToken: String,
+  passwordResetExpires: Date,
   passwordChangedAt: Date,
 });
 
@@ -78,7 +81,31 @@ userSchema.methods.changedPasswordAfterTokenIssue = function(jwtTimestamp) {
     return jwtTimestamp < changedAtTimestamp;
   }
 
+  // If user didn't change password
   return false;
+};
+
+userSchema.pre('save', function(next) {
+  if (!this.isModified('password') || this.isNew()) {
+    return next();
+  }
+
+  this.passwordChangedAt = Date.now() - 1000; // Ensure that the token is always created after modifying the passwordChangedAt property (so the user will be able to login)
+  next();
+});
+
+userSchema.methods.createPasswordResetToken = function() {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  // eslint-disable-next-line prettier/prettier
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // Modify the first number to set the password expiration time in minutes
+
+  return resetToken;
 };
 
 const User = mongoose.model('User', userSchema);
