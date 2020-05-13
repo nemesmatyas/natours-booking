@@ -33,6 +33,11 @@ const userSchema = new mongoose.Schema({
   passwordResetToken: String,
   passwordResetExpires: Date,
   passwordChangedAt: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
 
 // Password hashing
@@ -45,6 +50,13 @@ userSchema.pre('save', async function(next) {
   this.password = await bcrypt.hash(this.password, 12);
   this.passwordConfirm = undefined; // Don't store passwordConfirm in the database. Just needed for validation
 
+  next();
+});
+
+// Used to filter out inactive users when returning list of users
+userSchema.pre(/^find/, function(next) {
+  // 'this' keyword points to the current query
+  this.find({ active: { $ne: false } });
   next();
 });
 
