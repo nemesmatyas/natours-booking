@@ -98,7 +98,7 @@ userSchema.methods.changedPasswordAfterTokenIssue = function(jwtTimestamp) {
 };
 
 userSchema.pre('save', function(next) {
-  if (!this.isModified('password') || this.isNew()) {
+  if (!this.isModified('password') || this.isNew) {
     return next();
   }
 
