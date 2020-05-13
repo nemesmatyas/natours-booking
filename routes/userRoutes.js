@@ -18,6 +18,8 @@ router.patch(
   authController.updatePassword
 );
 
+router.patch('/updateMe', authController.protect, userController.updateMe);
+
 // eslint-disable-next-line prettier/prettier
 router
   .route('/')
