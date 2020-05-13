@@ -12,6 +12,12 @@ router.post('/forgotPassword', authController.forgotPassword);
 
 router.patch('/resetPassword/:token', authController.resetPassword);
 
+router.patch(
+  '/updateMyPassword',
+  authController.protect,
+  authController.updatePassword
+);
+
 // eslint-disable-next-line prettier/prettier
 router
   .route('/')
