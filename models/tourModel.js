@@ -105,6 +105,13 @@ tourSchema.virtual('durationInWeeks').get(function() {
   return this.duration / 7;
 });
 
+// Virtual populate
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id',
+});
+
 // Mongoose middleware - 'pre' hook - runs before the document is saved to the database (on .save() and . create() methods)
 // eslint-disable-next-line prettier/prettier
 tourSchema.pre('save', function(next) {

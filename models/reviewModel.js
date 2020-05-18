@@ -45,6 +45,15 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+// Get the user and tour for the review
+reviewSchema.pre(/^find/, function(next) {
+  this.populate({
+    path: 'author',
+    select: 'name photo',
+  });
+  next();
+});
+
 const Review = mongoose.model('Review', reviewSchema);
 
 module.exports = Review;
