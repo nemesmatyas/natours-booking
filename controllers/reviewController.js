@@ -2,7 +2,12 @@ const Review = require('../models/reviewModel');
 const catchAsync = require('../utils/catchAsync');
 
 exports.getAllReviews = catchAsync(async (req, res, next) => {
-  const reviews = await Review.find();
+  let filter = {};
+  if (req.params.tourId) {
+    filter = { tour: req.params.tourId };
+  }
+
+  const reviews = await Review.find(filter);
 
   // Send response
   res.status(200).json({
@@ -15,6 +20,14 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
 });
 
 exports.createReview = catchAsync(async (req, res, next) => {
+  // If the user doesn't specify to which tour he wants to write a review, the review will be written to the user specified in the url
+  if (!req.body.tour) {
+    req.body.tour = req.params.tourId;
+  }
+  // Same thing with the user
+  if (!req.body.author) {
+    req.body.author = req.user.id;
+  }
   const newReview = await Review.create(req.body);
 
   // Send response after creation
