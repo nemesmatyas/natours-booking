@@ -1,26 +1,7 @@
 const Review = require('../models/reviewModel');
-const catchAsync = require('../utils/catchAsync');
+const factory = require('./handlerFactory');
 
-exports.getAllReviews = catchAsync(async (req, res, next) => {
-  let filter = {};
-  if (req.params.tourId) {
-    filter = { tour: req.params.tourId };
-  }
-
-  const reviews = await Review.find(filter);
-
-  // Send response
-  res.status(200).json({
-    status: 'success',
-    results: reviews.length,
-    data: {
-      reviews,
-    },
-  });
-});
-
-exports.createReview = catchAsync(async (req, res, next) => {
-  // If the user doesn't specify to which tour he wants to write a review, the review will be written to the user specified in the url
+exports.setTourAndUserIds = (req, res, next) => {
   if (!req.body.tour) {
     req.body.tour = req.params.tourId;
   }
@@ -28,13 +9,15 @@ exports.createReview = catchAsync(async (req, res, next) => {
   if (!req.body.author) {
     req.body.author = req.user.id;
   }
-  const newReview = await Review.create(req.body);
+  next();
+};
 
-  // Send response after creation
-  res.status(201).json({
-    status: 'success',
-    data: {
-      review: newReview,
-    },
-  });
-});
+exports.getAllReviews = factory.getAll(Review);
+
+exports.getReview = factory.getOne(Review);
+
+exports.createReview = factory.createOne(Review);
+
+exports.updateReview = factory.updateOne(Review);
+
+exports.deleteReview = factory.deleteOne(Review);
