@@ -12,15 +12,23 @@ router.post('/forgotPassword', authController.forgotPassword);
 
 router.patch('/resetPassword/:token', authController.resetPassword);
 
-router.patch(
-  '/updateMyPassword',
-  authController.protect,
-  authController.updatePassword
-);
+/**
+ * From this point on, all routes require the user to be logged in
+ */
+router.use(authController.protect);
 
-router.patch('/updateMe', authController.protect, userController.updateMe);
+router.patch('/updateMyPassword', authController.updatePassword);
 
-router.delete('/deleteMe', authController.protect, userController.deleteMe);
+router.get('/me', userController.getMe, userController.getUser);
+
+router.patch('/updateMe', userController.updateMe);
+
+router.delete('/deleteMe', userController.deleteMe);
+
+/**
+ * From this point on, all routes are restricted to admins
+ */
+router.use(authController.restrictTo('admin'));
 
 router
   .route('/')
