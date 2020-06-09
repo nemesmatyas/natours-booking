@@ -108,6 +108,9 @@ tourSchema.index({
 tourSchema.index({
   slug: 1,
 });
+tourSchema.index({
+  startLocation: '2dsphere',
+});
 
 // eslint-disable-next-line prettier/prettier
 tourSchema.virtual('durationInWeeks').get(function() {
