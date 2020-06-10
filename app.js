@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
@@ -10,6 +11,12 @@ const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 
 const app = express();
+
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
+// Serving media assets as static files
+app.use(express.static(path.join(__dirname, 'public')));
 
 /************************************************ MIDDLEWARES **********************************************************/
 // Morgan - logging middleware
@@ -51,10 +58,13 @@ app.use(
   })
 );
 
-// Serving media assets as static files - temporary
-app.use(express.static('./public'));
-
 /***************************************************** ROUTES *******************************************************/
+app.get('/', (req, res) => {
+  res.status(200).render('base', {
+    tour: 'The Forest Hiker',
+    user: 'matyas',
+  });
+});
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
