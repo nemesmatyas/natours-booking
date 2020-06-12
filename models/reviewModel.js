@@ -28,13 +28,11 @@ const reviewSchema = new mongoose.Schema(
         required: [true, 'Review must belong to a tour'],
       },
     ],
-    author: [
-      {
-        type: mongoose.Schema.ObjectId,
-        ref: 'User',
-        required: [true, 'Review must belong to a user'],
-      },
-    ],
+    user: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
+      required: [true, 'Review must belong to a user'],
+    },
   },
   {
     toJSON: {
@@ -60,7 +58,7 @@ reviewSchema.index(
 // Get the user and tour for the review
 reviewSchema.pre(/^find/, function(next) {
   this.populate({
-    path: 'author',
+    path: 'user',
     select: 'name photo',
   });
   next();
@@ -81,7 +79,6 @@ reviewSchema.statics.calcAverageRatings = async function(tourID) {
       },
     },
   ]);
-  console.log(stats);
 
   if (stats.length > 0) {
     await Tour.findByIdAndUpdate(tourID, {
