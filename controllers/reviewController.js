@@ -6,7 +6,7 @@ exports.setTourAndUserIds = (req, res, next) => {
     req.body.tour = req.params.tourId;
   }
   // Same thing with the user
-  if (!req.body.author) {
+  if (!req.body.user) {
     req.body.author = req.user.id;
   }
   next();
