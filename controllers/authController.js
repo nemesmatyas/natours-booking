@@ -82,6 +82,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token) {
@@ -114,6 +116,38 @@ exports.protect = catchAsync(async (req, res, next) => {
   next();
 });
 
+/**
+ * Checks at every request if the user is logged in or not
+ * Use only for rendered pages on client side
+ * If you want to protect routes in the API, use the .protect method
+ */
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  if (req.cookies.jwt) {
+    // Token verification
+    const decodedToken = await promisify(jwt.verify)(
+      req.cookies.jwt,
+      process.env.JWT_SECRET
+    );
+
+    // Check if user still exists
+    const currentUser = await User.findById(decodedToken.id);
+
+    if (!currentUser) {
+      return next();
+    }
+
+    // Check if user changed password after the token was issued
+    if (currentUser.changedPasswordAfterTokenIssue(decodedToken.iat)) {
+      return next();
+    }
+
+    // If this code runs, there is a logged in user
+    res.locals.user = currentUser; // Pass user to Pug template
+    return next();
+  }
+  next();
+});
+
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
@@ -140,7 +174,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   const resetURL = `${req.protocol}://${req.get(
     'host'
   )}/api/v1/users/resetPassword/${resetToken}`;
-  console.log(resetURL);
 
   const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\n If you didnt forget your password, please ignore this email.`;
 

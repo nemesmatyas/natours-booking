@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
@@ -38,6 +39,9 @@ app.use('/api', limiter);
 
 // JSON body parser middleware to have the request body available on the req object when sending a POST request
 app.use(express.json({ limit: '10kb' }));
+
+// Parse the data from the incoming cookie
+app.use(cookieParser());
 
 // Data sanitization - defend against NoSQL query injection
 app.use(mongoSanitize());
