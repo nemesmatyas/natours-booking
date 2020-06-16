@@ -1,6 +1,8 @@
 /* eslint-disable */
+import axios from 'axios';
+import { showAlert } from './alerts';
 
-const login = async (email, password) => {
+export const login = async (email, password) => {
   try {
     const result = await axios({
       method: 'POST',
@@ -12,19 +14,15 @@ const login = async (email, password) => {
     });
 
     if (result.data.status === 'success') {
-      alert('Logged in successfully. You will redirected shortly...');
+      showAlert(
+        'success',
+        'Login successful! You will be redirected shortly...'
+      );
       window.setTimeout(() => {
         location.assign('/');
       }, 1500);
     }
   } catch (err) {
-    alert('Incorrect email or password');
+    showAlert('error', 'Incorrect username or password');
   }
 };
-
-document.querySelector('.form').addEventListener('submit', (e) => {
-  e.preventDefault();
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-  login(email, password);
-});
